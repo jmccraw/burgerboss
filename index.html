@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <link rel="dns-prefetch" href="http://ajax.googleapis.com" />
   <link rel="dns-prefetch" href="http://fonts.nymag.com" />
-  <title>Dodge the Stuff Game &mdash; HTML5 Gaming</title>
+  <link rel="dns-prefetch" href="http://pixel.nymag.com" />
+  <title>Bob's Burger Time &mdash; HTML5 Gaming</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
   <script>
     document.createElement("section");
@@ -27,36 +27,44 @@
       font-weight: 400;
     }
 
-    #dodgeGameMobileTap {
+    #burgerBossMobileTap {
       display: none;
     }
 
-    #dodgeGame {
+    #burgerBoss {
       margin: 0 auto 30px;
       width: 100%;
       max-width: 417px;
     }
 
     @media screen and (max-width: 600px) {
-      #dodgeGameMobileTap {
+      #burgerBossMobileTap {
         display: block;
         margin: 0 auto;
         width: 100%;
         height: auto;
       }
 
-      #dodgeGame {
+      #burgerBoss {
         display: none;
         margin-left: -13px;
       }
     }
   </style>
 
-  <img id="dodgeGameMobileTap" src="http://pixel.nymag.com/content/dam/daily/other/2014/05/21/launchTheGame.png" alt="Launch the Game" />
-  <article id="dodgeGame"></article>
+  <img id="burgerBossMobileTap" src="http://pixel.nymag.com/content/dam/daily/other/2014/05/21/launchTheGame.png" alt="Launch the Game" />
+  <article id="burgerBoss"></article>
+
+  <script data-main="js/main.js" src="js/require.js"></script>
   
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-  <script src="js/phaser.js"></script>
+  <!-- <script src="js/phaser.min.js"></script>
+  <script src="js/boot.js"></script>
+  <script src="js/load.js"></script>
+  <script src="js/menu"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/start.js"></script>
+  <script src="js/gameover.js"></script>
+  <script src="js/main.js"></script> -->
   <script>
   // ;(function() {
     "use strict";
@@ -103,17 +111,17 @@
       * Launches the game, if on mobile
       */
     var launchTheGame = function() {
-      var theGame = document.getElementById("dodgeGame");
+      var theGame = document.getElementById("burgerBoss");
       theGame.style.display = "block";
       theGame.scrollIntoView();
     };
     if (/\/m\//.test(window.location.href) || window.innerWidth < 800) {
-      gameLauncher = document.getElementById("dodgeGameMobileTap");
+      gameLauncher = document.getElementById("burgerBossMobileTap");
       gameLauncher.addEventListener("click", launchTheGame, false);
     }
 
     // set up the Phaser game instance
-    game = new Phaser.Game(417, 600, Phaser.AUTO, "dodgeGame");
+    game = new Phaser.Game(417, 600, Phaser.AUTO, "burgerBoss");
 
     /**
       * The main game state
