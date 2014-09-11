@@ -10,7 +10,7 @@
     }
   });
 
-  requirejs(["phaser.min", "boot", "load", "tutorial", "menu", "start", "gameover"], function(Phaser, Game) {
+  requirejs(["phaser.min", "boot", "load", "tutorial", "menu", "start", "gameover"], function(Phaser) {
     var game;
     var player;
     var cursors;
