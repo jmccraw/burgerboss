@@ -62,6 +62,9 @@
       gameLauncher.addEventListener("click", launchTheGame, false);
     }
 
+    console.log("ABOUT TO PHASER");
+    console.log(Phaser);
+
     // set up the Phaser game instance
     game = new Phaser.Game(417, 600, Phaser.AUTO, "burgerBoss");
 
