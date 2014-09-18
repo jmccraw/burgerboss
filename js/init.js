@@ -12,7 +12,8 @@ var settings = {
   "global": {
     "mobile": false,
     "score": 0,
-    "getCount": 0
+    "getCount": 0,
+    "level": 0
   },
   "player": {
     "killed": false,
@@ -52,7 +53,7 @@ if (/\/m\//.test(window.location.href) || window.innerWidth < 800) {
 }
 
 // set up the Phaser game instance
-game = new Phaser.Game(417, 600, Phaser.AUTO, "burgerBoss");
+game = new Phaser.Game(600, 600, Phaser.AUTO, "burgerBoss");
 
 game.state.add("boot", _BOOT);
 game.state.add("load", _LOAD);
