@@ -2,6 +2,10 @@
 
 var game;
 var player;
+var platforms;
+var ladders;
+
+
 var cursors;
 var collectibles;
 var dodges;
@@ -57,7 +61,6 @@ game = new Phaser.Game(600, 600, Phaser.AUTO, "burgerBoss");
 
 game.state.add("boot", _BOOT);
 game.state.add("load", _LOAD);
-game.state.add("tutorial", _TUTORIAL);
 game.state.add("start", _START);
 game.state.add("main", _MAIN);
 game.state.add("gameover", _GAMEOVER);

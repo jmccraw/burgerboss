@@ -8,11 +8,11 @@
  */
 var LevelFactory = function(opts) {
 
-}
+};
 
 /**
  * Load the level
  */
-LevelFactory.prototype.loadLevel() {
+LevelFactory.prototype.loadLevel = function() {
 
-}
+};

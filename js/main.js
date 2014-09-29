@@ -4,101 +4,6 @@
   * The main game state
   */
 var _MAIN = {
-  /**
-    * The text that appears over a character's head
-    * @param{String} text The text to display above head
-    * @param{boolean} bonus Whether this is a bonus catch phrase or hiccup
-    * @param{boolean} shift Whether to shift left or up
-    */
-  "popUpText": function(text, bonus, shift) {
-    var tempLabel;
-    var tempTween;
-    var tempSprite;
-    var tempTween2;
-    var leftSide = (player.x + (player.width * 2) >= game.world.width ? true : false);
-
-    // if the player text can be on the right
-    if (!leftSide) {
-      tempLabel = game.add.text(
-        (!shift ? player.x + (player.width / 2) : player.x + 10),
-        (!shift ? player.y : player.y + 40),
-        text, {
-          "font": "400 15px/1 Arcade-Normal, sans-serif",
-          "fill": "#fff",
-          "align": "center"
-        });
-    }
-    // if the player is too far to the right, display the text on the left, instead
-    else {
-      tempLabel = game.add.text(
-        (!shift ? player.x + (player.width / 2) : player.x + player.width + 10),
-        (!shift ? player.y : player.y + 40),
-        text, {
-          "font": "400 15px/1 Arcade-Normal, sans-serif",
-          "fill": "#fff",
-          "align": "center"
-        });
-    }
-    tempLabel.anchor.setTo(0.5, 0.5);
-    // if the player has enough space on the right, display it there
-    if (!leftSide) {
-      tempTween = game.add.tween(tempLabel).to(
-        (!shift ? {"y": tempLabel.y - 20} : {"x": tempLabel.x - 35, "y": tempLabel.y - 58}),
-        (!shift ? 300 : 600),
-        Phaser.Easing.Linear.None, true, 0, 0, false)
-        .to({"alpha": 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, false);
-    }
-    // else, display it on the left
-    else {
-      tempTween = game.add.tween(tempLabel).to(
-        (!shift ? {"y": tempLabel.y - 20} : {"x": tempLabel.x + player.width + 35, "y": tempLabel.y - 58}),
-        (!shift ? 300 : 600),
-        Phaser.Easing.Linear.None, true, 0, 0, false)
-        .to({"alpha": 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, false);
-    }
-    tempTween._lastChild.onComplete.add(function() {
-      tempLabel.destroy();
-    });
-    // increment how many times user caught something
-    ++settings.global.getCount;
-    // display the hiccup after every fifth drink/bonus caught
-    if ((settings.global.getCount === 5) && !bonus) {
-      settings.global.getCount = 0;
-      var tempSprite;
-      var tempTween2;
-      // if the player has enough space on the right, display it there
-      if (!leftSide) {
-        tempSprite = game.add.sprite(player.x + player.width + 25, player.y + 25, "hiccup");
-      }
-      // else, display it on the left
-      else {
-        tempSprite = game.add.sprite(player.x - 30, player.y + 25, "hiccupAlt");
-      }
-      tempSprite.anchor.setTo(0.5, 0.5);
-      tempTween2 = game.add.tween(tempSprite).to({"y": tempSprite.y - 15}, 300, Phaser.Easing.Linear.None, true, 0, 0, false)
-        .to({"alpha": 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, false);
-      tempTween2._lastChild.onComplete.add(function() {
-        tempSprite.kill();
-      });
-    }
-  },
-
-  "generateCatchPhrase": function() {
-    var phrase;
-    var leftSide = (player.x + (player.width * 2) >= game.world.width ? true : false);
-    if (!leftSide) {
-      phrase = game.add.sprite(player.x + player.width + 23, player.y - 20, "catchPhrase" + (game.time.now % 2 === 0 ? "" : "2"));
-    }
-    else {
-      phrase = game.add.sprite(player.x - 45, player.y - 20, "catchPhrase" + (game.time.now % 2 === 0 ? "Alt" : "2Alt"));
-    }
-    phrase.anchor.setTo(0.5, 0.5);
-    var phraseTween = game.add.tween(phrase).to({"y": phrase.y - 15}, 600, Phaser.Easing.Linear.None, true, 0, 0, false)
-      .to({"alpha": 0}, 200, Phaser.Easing.Linear.None, true, 0, 0, false);
-    phraseTween._lastChild.onComplete.add(function() {
-      phrase.kill();
-    });
-  },
 
   "addCollectible": function(player, collectible) {
     collectible.kill();
@@ -148,6 +53,12 @@ var _MAIN = {
   "moveRight": function() {
     if (!settings.player.killed) {
       player.body.velocity.x = settings.player.speed;
+    }
+  },
+
+  "jump": function() {
+    if (!settings.player.killed && player.body.touching.down) {
+      player.body.velocity.y = -350;
     }
   },
 
@@ -240,27 +151,28 @@ var _MAIN = {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     // main game background
-    game.add.sprite(0, 0, "background");
+    //game.add.sprite(0, 0, "background");
 
-    // create the player
-    player = game.add.sprite(
-      (!settings.player.tutorial.modified ? game.world.centerX - 34 : settings.player.tutorial.x),
-      (!settings.player.tutorial.modified ? game.world.height - 129 : settings.player.tutorial.y), "character");
-    game.physics.arcade.enable(player);
-    player.body.collideWorldBounds = true;
-    player.body.setSize(player.width, player.height / 2, 0, 0);
+    // generate the platform group for ground and edges and such
+    platforms = game.add.group();
+    platforms.enableBody = true;
 
-    // generate collectibles
-    collectibles = game.add.group();
-    collectibles.enableBody = true;
+    // generate the ground
+    var ground = platforms.create(0, game.world.height - 40, "ground");
+    ground.body.immovable = true;
 
-    // generate things to dodge
-    dodges = game.add.group();
-    dodges.enableBody = true;
+    // TODO FIXME: generate some ledges, based on data we load in from the levels folder
+    var ledge = platforms.create(400, 430, "ground");
+    ledge.body.immovable = true;
+    ledge = platforms.create(-150, 250, "ground");
+    ledge.body.immovable = true;
 
-    // generate bonus items to collect
-    bonuses = game.add.group();
-    bonuses.enableBody = true;
+    // generate the ladders
+    ladders = game.add.group();
+    ladders.enableBody = true;
+
+    // TODO FIXME: generate the ladders, based on data we load in from the levels folder
+    var ladder = ladders.create(300, game.world.height - 278, "ladder");
 
     // create the scoreboard
     scoreboard = game.add.text(205, 30,
@@ -271,63 +183,33 @@ var _MAIN = {
       });
     scoreboard.anchor.setTo(0, 0.5);
 
-    // increment collectible timer
-    game.time.events.loop(300, function() {
-      ++settings.collectible.offset;
-    }, this);
-
-    // increment bonus timer
-    game.time.events.loop(1000, function() {
-      ++settings.bonus.offset;
-    }, this);
-
-    // increment dodge timer
-    game.time.events.loop(500, function() {
-      ++settings.dodge.offset;
-    }, this);
-
-    // add the first collectible and generate a loop
-    this.createCollectible();
-    game.time.events.loop(2000 - (settings.collectible.offset / 2), function() {
-      this.createCollectible();
-    }, this);
-    // generate second collectible
-    game.time.events.loop(4500 - (settings.collectible.offset / 2), function() {
-      this.createCollectible();
-    }, this);
-
-    // add first dodge and generate loop
-    this.createDodge();
-    game.time.events.loop(3500 - (settings.dodge.offset / 2), function() {
-      this.createDodge();
-    }, this);
-    // generate second dodge loop
-    game.time.events.loop(3000 - (settings.dodge.offset / 2), function() {
-      this.createDodge();
-    }, this);
-
-    // generate bonus loop
-    game.time.events.loop(15000 - (settings.bonus.offset / 2), function() {
-      this.createBonus();
-    }, this);
+    // create the player
+    player = game.add.sprite(game.world.width / 2 - 31, game.world.height - 200, "bob");
+    game.physics.arcade.enable(player);
+    player.body.bounce.y = .2;
+    player.body.gravity.y = 300;
+    player.body.collideWorldBounds = true;
+    player.body.setSize(player.width, player.height, 0, 0);
 
     // target inputs
     cursors = game.input.keyboard.createCursorKeys();
+    // move left
     cursors.left.onDown.add(this.moveLeft, this);
     cursors.left.onUp.add(this.stopMoving, this);
+    // move right
     cursors.right.onDown.add(this.moveRight, this);
     cursors.right.onUp.add(this.stopMoving, this);
+    // jump
+    cursors.up.onDown.add(this.jump, this);
+
     game.input.onDown.add(this.testMovement, this);
     game.input.onUp.add(this.stopMoving, this);
   },
 
   "update": function() {
     if (!settings.player.killed) {
-      if ((game.time.totalElapsedSeconds() > 0.5) && !settings.dodge.seconded) {
-        settings.dodge.seconded = true;
-        this.createDodge();
-      }
       // collision detections
+      game.physics.arcade.collide(player, platforms);
       game.physics.arcade.overlap(player, collectibles, this.addCollectible, null, this);
       game.physics.arcade.overlap(player, dodges, this.killPlayer, null, this);
       game.physics.arcade.overlap(player, bonuses, this.collectBonus, null, this);
