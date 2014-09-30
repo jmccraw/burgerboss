@@ -184,7 +184,7 @@ var _MAIN = {
     scoreboard.anchor.setTo(0, 0.5);
 
     // create the player
-    player = game.add.sprite(game.world.width / 2 - 31, game.world.height - 200, "bob");
+    player = game.add.sprite(game.world.width / 2 - 85, game.world.height - 210, "bob");
     game.physics.arcade.enable(player);
     player.body.bounce.y = .2;
     player.body.gravity.y = 300;
