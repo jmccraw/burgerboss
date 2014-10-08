@@ -162,9 +162,9 @@ var _MAIN = {
     ground.body.immovable = true;
 
     // TODO FIXME: generate some ledges, based on data we load in from the levels folder
-    var ledge = platforms.create(400, 430, "ground");
+    var ledge = platforms.create(400, 400, "ground");
     ledge.body.immovable = true;
-    ledge = platforms.create(-150, 250, "ground");
+    ledge = platforms.create(-400, 250, "ground");
     ledge.body.immovable = true;
 
     // generate the ladders
